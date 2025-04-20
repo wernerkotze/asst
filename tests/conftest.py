@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, patch
+import httpx
 
 from app.main import app
 from app.db import get_db
@@ -9,7 +10,9 @@ from app.db import get_db
 @pytest.fixture
 def test_client():
     """Create a test client for the FastAPI app."""
-    return TestClient(app)
+    # Use a context manager to ensure proper cleanup
+    with TestClient(app) as client:
+        yield client
 
 
 @pytest.fixture
