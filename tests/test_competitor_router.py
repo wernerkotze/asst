@@ -65,8 +65,8 @@ def sample_competitor_response():
 def test_analyze_competitors_endpoint_success(mock_analyze_competitors, test_client, override_get_db,
                                              sample_competitor_request, sample_competitor_response):
     """Test successful competitor analysis endpoint."""
-    # Setup the mock
-    mock_analyze_competitors.return_value = AsyncMock(return_value=sample_competitor_response)
+    # Setup the mock to return the sample response directly
+    mock_analyze_competitors.return_value = sample_competitor_response
     
     # Make the request
     response = test_client.post("/analyze/competitors/", json=sample_competitor_request)
