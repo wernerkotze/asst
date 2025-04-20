@@ -39,8 +39,8 @@ def sample_brand_response():
 def test_analyze_brand_endpoint_success(mock_analyze_brand, test_client, override_get_db, 
                                         sample_brand_request, sample_brand_response):
     """Test successful brand analysis endpoint."""
-    # Setup the mock
-    mock_analyze_brand.return_value = AsyncMock(return_value=sample_brand_response)
+    # Setup the mock to return the sample response directly
+    mock_analyze_brand.return_value = sample_brand_response
     
     # Make the request
     response = test_client.post("/analyze/brand/", json=sample_brand_request)
