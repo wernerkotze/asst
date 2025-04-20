@@ -38,8 +38,8 @@ def sample_content_response():
 def test_generate_content_endpoint_success(mock_generate_content, test_client, override_get_db,
                                           sample_content_request, sample_content_response):
     """Test successful content generation endpoint."""
-    # Setup the mock
-    mock_generate_content.return_value = AsyncMock(return_value=sample_content_response)
+    # Setup the mock to return the sample response directly
+    mock_generate_content.return_value = sample_content_response
     
     # Make the request
     response = test_client.post("/generate/content/", json=sample_content_request)
