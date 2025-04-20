@@ -2,7 +2,7 @@ import logging
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import brand_router, competitor_router, content_router
+from app.routers import brand_router, competitor_router, content_router, pipeline_router, scheduling_router, content_generator_router
 from app.db import init_mongodb, close_db_connections
 
 # Set up logging
@@ -15,8 +15,11 @@ logger = logging.getLogger(__name__)
 # Create FastAPI app
 app = FastAPI(
     title="ASST API",
-    description="Analysis and Content Generation Service API",
+    description="AI-Driven Social Media Automation Suite",
     version="0.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
 )
 
 # Add CORS middleware
@@ -29,9 +32,12 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(pipeline_router.router)
 app.include_router(brand_router.router)
 app.include_router(competitor_router.router)
 app.include_router(content_router.router)
+app.include_router(scheduling_router.router)
+app.include_router(content_generator_router.router)
 
 @app.on_event("startup")
 async def startup_event():
@@ -59,7 +65,9 @@ async def shutdown_event():
 async def root():
     """Root endpoint."""
     return {
-        "message": "Welcome to the ASST API",
+        "message": "Welcome to the ASST API - AI-Driven Social Media Automation Suite",
+        "description": "Enable brands, influencers, and creators to go from inspiration to published social content in minutes",
+        "version": "0.1.0",
         "docs": "/docs",
         "redoc": "/redoc"
     }
