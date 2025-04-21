@@ -3,7 +3,7 @@ from unittest.mock import patch, AsyncMock
 from fastapi.testclient import TestClient
 from datetime import datetime
 
-from app.models.schemas import BrandAnalysisRequest, BrandAnalysisResponse
+from app.models.persona import BrandAnalysisRequest, PersonaProfile
 
 
 @pytest.fixture
@@ -12,8 +12,8 @@ def sample_brand_request():
     return {
         "brand_name": "Test Brand",
         "industry": "Technology",
-        "keywords": ["test", "brand", "tech"],
-        "time_period": "last_month"
+        "pinterest_board": "username/test-board",
+        "keywords": ["test", "brand", "tech"]
     }
 
 
@@ -21,17 +21,18 @@ def sample_brand_request():
 def sample_brand_response():
     """Sample brand analysis response for testing."""
     return {
+        "id": "persona_12345",
+        "pipelineId": None,
         "brand_name": "Test Brand",
-        "sentiment_score": 0.75,
-        "market_position": {
-            "rank": 5,
-            "market_share": "8%",
-            "growth_trend": "stable"
-        },
-        "strengths": ["Quality products", "Brand recognition"],
-        "weaknesses": ["Limited market reach", "High prices"],
-        "recommendations": ["Expand to new markets", "Adjust pricing strategy"],
-        "analysis_date": datetime.now().isoformat()
+        "industry": "Technology",
+        "name": "Vintage Cozy",
+        "colors": ["#C16639", "#708D81", "#F5A9B8"],
+        "tone_keywords": ["playful", "cozy", "vintage"],
+        "style_keywords": ["home", "retro", "comfort"],
+        "content_themes": ["home", "retro", "comfort"],
+        "voice_description": "Warm, nostalgic, friendly tone",
+        "createdAt": datetime.now().isoformat(),
+        "updatedAt": datetime.now().isoformat()
     }
 
 
@@ -46,15 +47,15 @@ def test_analyze_brand_endpoint_success(mock_analyze_brand, test_client, overrid
     response = test_client.post("/analyze/brand/", json=sample_brand_request)
     
     # Check the response
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
     assert data["brand_name"] == sample_brand_request["brand_name"]
-    assert "sentiment_score" in data
-    assert "market_position" in data
-    assert "strengths" in data
-    assert "weaknesses" in data
-    assert "recommendations" in data
-    assert "analysis_date" in data
+    assert data["industry"] == sample_brand_request["industry"]
+    assert "tone_keywords" in data
+    assert "style_keywords" in data
+    assert "content_themes" in data
+    assert "voice_description" in data
+    assert "createdAt" in data
 
 
 @patch("app.routers.brand_router.analyze_brand")
@@ -71,4 +72,4 @@ def test_analyze_brand_endpoint_error(mock_analyze_brand, test_client, override_
     assert response.status_code == 500
     data = response.json()
     assert "detail" in data
-    assert "Brand analysis failed" in data["detail"]
+    assert "Failed to analyze Pinterest board" in data["detail"]

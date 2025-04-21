@@ -33,3 +33,8 @@ class Settings(BaseSettings):
 
 # Create settings instance
 settings = Settings()
+
+# Function to get settings (for dependency injection)
+def get_settings():
+    """Return the settings instance."""
+    return settings

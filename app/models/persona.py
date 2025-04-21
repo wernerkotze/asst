@@ -6,11 +6,14 @@ class PersonaProfile(BaseModel):
     """Persona profile derived from brand analysis."""
     id: Optional[str] = Field(None, description="Persona profile ID")
     pipelineId: Optional[str] = Field(None, description="Reference to pipeline")
+    brand_name: str = Field(..., description="Name of the brand")
+    industry: str = Field(..., description="Industry of the brand")
     name: str = Field(..., description="Name of the persona")
     colors: List[str] = Field(default=[], description="Color hex codes for the brand palette")
-    traits: List[str] = Field(default=[], description="Personality traits of the persona")
-    voiceDescription: str = Field(..., description="Description of the persona's voice")
-    keywords: List[str] = Field(default=[], description="Key phrases and terms associated with the persona")
+    tone_keywords: List[str] = Field(default=[], description="Tone keywords for the persona")
+    style_keywords: List[str] = Field(default=[], description="Style keywords for the persona")
+    content_themes: List[str] = Field(default=[], description="Content themes for the persona")
+    voice_description: str = Field(..., description="Description of the persona's voice")
     createdAt: datetime = Field(default_factory=datetime.now, description="Creation timestamp")
     updatedAt: datetime = Field(default_factory=datetime.now, description="Last update timestamp")
     
@@ -19,26 +22,35 @@ class PersonaProfile(BaseModel):
             "example": {
                 "id": "persona_12345",
                 "pipelineId": "pipeline_67890",
+                "brand_name": "Chelsea FC",
+                "industry": "Sports",
                 "name": "Vintage Cozy",
                 "colors": ["#C16639", "#708D81", "#F5A9B8"],
-                "traits": ["playful", "cozy", "vintage"],
-                "voiceDescription": "Warm, nostalgic, friendly tone",
-                "keywords": ["home", "retro", "comfort"]
+                "tone_keywords": ["playful", "cozy", "vintage"],
+                "style_keywords": ["home", "retro", "comfort"],
+                "content_themes": ["home", "retro", "comfort"],
+                "voice_description": "Warm, nostalgic, friendly tone"
             }
         }
 
 class BrandAnalysisRequest(BaseModel):
     """Request for brand analysis from Pinterest board."""
-    boardId: str = Field(..., description="Pinterest board ID or URL")
-    assets: Optional[List[HttpUrl]] = Field(default=[], description="Optional URLs to brand assets")
+    brand_name: str = Field(..., description="Name of the brand")
+    industry: str = Field(..., description="Industry of the brand")
+    pinterest_board: str = Field(..., description="Pinterest board ID or URL")
+    keywords: List[str] = Field(default=[], description="Keywords associated with the brand")
     pipelineId: Optional[str] = Field(None, description="Pipeline ID to associate with the persona")
+    assets: Optional[List[HttpUrl]] = Field(default=[], description="Optional URLs to brand assets")
     
     class Config:
         schema_extra = {
             "example": {
-                "boardId": "username/boardname",
-                "assets": ["https://example.com/logo.png"],
-                "pipelineId": "pipeline_67890"
+                "brand_name": "Chelsea FC",
+                "industry": "Sports",
+                "pinterest_board": "username/chelsea-board",
+                "keywords": ["football", "premier league", "chelsea"],
+                "pipelineId": "pipeline_67890",
+                "assets": ["https://example.com/logo.png"]
             }
         }
 

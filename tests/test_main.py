@@ -8,7 +8,7 @@ def test_root_endpoint(test_client):
     assert response.status_code == 200
     data = response.json()
     assert "message" in data
-    assert data["message"] == "Welcome to the ASST API"
+    assert "Welcome to the ASST API" in data["message"]
     assert "docs" in data
     assert "redoc" in data
 

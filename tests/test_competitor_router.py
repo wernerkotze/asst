@@ -3,28 +3,16 @@ from unittest.mock import patch, AsyncMock
 from fastapi.testclient import TestClient
 from datetime import datetime
 
-from app.models.schemas import CompetitorAnalysisRequest, CompetitorAnalysisResponse, CompetitorInfo
+from app.models.competitor import CompetitorAnalysisRequest, ContentFramework
 
 
 @pytest.fixture
 def sample_competitor_request():
     """Sample competitor analysis request for testing."""
     return {
-        "brand_name": "Test Brand",
-        "industry": "Technology",
-        "competitors": [
-            {
-                "name": "Competitor A",
-                "website": "https://competitora.com",
-                "market_share": "20%"
-            },
-            {
-                "name": "Competitor B",
-                "website": "https://competitorb.com",
-                "market_share": "15%"
-            }
-        ],
-        "analysis_depth": "standard"
+        "seedAccounts": ["ChelseaFC", "talkchelsea"],
+        "pipelineId": "pipeline_67890",
+        "tweetLimit": 200
     }
 
 
@@ -32,32 +20,16 @@ def sample_competitor_request():
 def sample_competitor_response():
     """Sample competitor analysis response for testing."""
     return {
-        "brand_name": "Test Brand",
-        "industry": "Technology",
-        "competitors": [
-            {
-                "name": "Competitor A",
-                "strengths": ["Market leader", "Strong R&D"],
-                "weaknesses": ["High prices", "Poor customer service"],
-                "market_share": "20%",
-                "sentiment_score": 0.65
-            },
-            {
-                "name": "Competitor B",
-                "strengths": ["Innovative products", "Good pricing"],
-                "weaknesses": ["Limited reach", "New to market"],
-                "market_share": "15%",
-                "sentiment_score": 0.72
-            }
-        ],
-        "competitive_landscape": {
-            "market_concentration": "medium",
-            "entry_barriers": "moderate",
-            "disruption_potential": "high"
-        },
-        "opportunities": ["Underserved segments", "International expansion"],
-        "threats": ["New entrants", "Regulatory changes"],
-        "analysis_date": datetime.now().isoformat()
+        "id": "framework_12345",
+        "pipelineId": "pipeline_67890",
+        "seedAccounts": ["ChelseaFC", "talkchelsea"],
+        "contentCategories": {"news": 0.4, "meme": 0.3, "opinion": 0.3},
+        "postingFrequency": {"perDay": 3, "perWeek": 21},
+        "peakTimes": {"hours": [12, 18], "days": ["Sat", "Tue"]},
+        "hashtagStrategy": ["#ChelseaFC", "#CFC", "#KTBFFH"],
+        "stylePresets": ["witty", "concise"],
+        "createdAt": datetime.now().isoformat(),
+        "updatedAt": datetime.now().isoformat()
     }
 
 
@@ -72,16 +44,17 @@ def test_analyze_competitors_endpoint_success(mock_analyze_competitors, test_cli
     response = test_client.post("/analyze/competitors/", json=sample_competitor_request)
     
     # Check the response
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
-    assert data["brand_name"] == sample_competitor_request["brand_name"]
-    assert data["industry"] == sample_competitor_request["industry"]
-    assert "competitors" in data
-    assert len(data["competitors"]) == len(sample_competitor_response["competitors"])
-    assert "competitive_landscape" in data
-    assert "opportunities" in data
-    assert "threats" in data
-    assert "analysis_date" in data
+    assert "seedAccounts" in data
+    assert data["seedAccounts"] == sample_competitor_response["seedAccounts"]
+    assert "contentCategories" in data
+    assert "postingFrequency" in data
+    assert "peakTimes" in data
+    assert "hashtagStrategy" in data
+    assert "stylePresets" in data
+    assert "createdAt" in data
+    assert "updatedAt" in data
 
 
 @patch("app.routers.competitor_router.analyze_competitors")
@@ -98,4 +71,4 @@ def test_analyze_competitors_endpoint_error(mock_analyze_competitors, test_clien
     assert response.status_code == 500
     data = response.json()
     assert "detail" in data
-    assert "Competitor analysis failed" in data["detail"]
+    assert "Twitter analysis failed" in data["detail"]
