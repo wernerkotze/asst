@@ -5,7 +5,7 @@ API interaction module for the ASST CLI.
 import json
 import sys
 import requests
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 
 from cli.config import get_config_value
 

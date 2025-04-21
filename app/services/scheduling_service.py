@@ -1,9 +1,8 @@
 import logging
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, List, Optional
 
 from app.models.scheduling import ScheduledPost, PostStatus, ScheduleRequest
-from app.config import get_settings
 
 # Set up logging
 logger = logging.getLogger(__name__)

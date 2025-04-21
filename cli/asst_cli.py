@@ -5,10 +5,8 @@ ASST CLI - Command Line Interface for the ASST AI-Driven Social Media Automation
 
 import argparse
 import json
-import os
 import sys
-from typing import Dict, List, Any, Optional
-import textwrap
+from typing import Dict
 
 from cli.api import ApiClient
 from cli.config import get_config_value
@@ -202,21 +200,16 @@ class AsstCli:
 def main():
     """Main entry point for the CLI."""
     parser = argparse.ArgumentParser(
-        description="ASST CLI - Command Line Interface for the ASST AI-Driven Social Media Automation Suite",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=textwrap.dedent("""
-        Examples:
-          asst_cli.py list-pipelines
-          asst_cli.py create-pipeline --name "My Pipeline" --type business
-          asst_cli.py analyze-brand --board-id "username/boardname" --pipeline-id "pipeline_12345"
-          asst_cli.py generate-content --pipeline-id "pipeline_12345" --sources news,twitter
-        """)
+        description="ASST CLI - Command Line Interface for the ASST AI-Driven Social Media Automation Suite"
     )
     
-    parser.add_argument("--api-url", help="API URL (default: http://localhost:8000)")
-    parser.add_argument("--output", choices=["text", "json"], default="text", help="Output format")
+    parser.add_argument("--api-url", help=f"API URL (default: {get_config_value('api_url')})")
+    parser.add_argument("--output", choices=["text", "json"], default="text", help="Output format (default: text)")
     
-    subparsers = parser.add_subparsers(dest="command", help="Command to execute")
+    subparsers = parser.add_subparsers(dest="command", help="Command to run")
+    
+    # Interactive mode command
+    interactive_parser = subparsers.add_parser("interactive", help="Start interactive chatbot-style mode")
     
     # List pipelines command
     list_pipelines_parser = subparsers.add_parser("list-pipelines", help="List all pipelines")
@@ -273,13 +266,17 @@ def main():
     
     args = parser.parse_args()
     
-    if not args.command:
-        parser.print_help()
-        sys.exit(1)
+    # Run interactive mode if requested
+    if args.command == "interactive":
+        from cli.interactive_mode import InteractiveSession
+        session = InteractiveSession(ApiClient(api_url=args.api_url))
+        session.start()
+        return
     
+    # Initialize CLI
     cli = AsstCli(api_url=args.api_url)
     
-    # Execute the appropriate command
+    # Run command
     if args.command == "list-pipelines":
         cli.list_pipelines(args)
     elif args.command == "create-pipeline":
@@ -294,6 +291,8 @@ def main():
         cli.schedule_post(args)
     elif args.command == "list-scheduled-posts":
         cli.list_scheduled_posts(args)
+    else:
+        parser.print_help()
 
 if __name__ == "__main__":
     main()

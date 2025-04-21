@@ -1,12 +1,9 @@
 import logging
 import re
-import aiohttp
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from urllib.parse import urlparse
 
 from app.models.persona import PersonaProfile, BrandAnalysisRequest, PinterestPin
-from app.config import get_settings
 
 # Set up logging
 logger = logging.getLogger(__name__)

@@ -1,7 +1,6 @@
 import logging
-import re
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 from collections import Counter
 import statistics
 
@@ -9,7 +8,6 @@ from app.models.competitor import (
     Tweet, AnalyzedTweet, ContentFramework, 
     CompetitorAnalysisRequest, TweetCategory, TweetSentiment
 )
-from app.config import get_settings
 
 # Set up logging
 logger = logging.getLogger(__name__)
