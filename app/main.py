@@ -1,8 +1,11 @@
 import logging
-from fastapi import FastAPI, Depends
+from pathlib import Path
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
-from app.routers import brand_router, competitor_router, content_router, pipeline_router, scheduling_router, content_generator_router
+from app.routers import brand_router, competitor_router, content_router, pipeline_router, scheduling_router, content_generator_router, frontend_router
 from app.db import init_mongodb, close_db_connections
 
 # Set up logging
@@ -31,7 +34,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files directory
+app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
+
+# Set up templates
+templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
+
 # Include routers
+app.include_router(frontend_router.router)
 app.include_router(pipeline_router.router)
 app.include_router(brand_router.router)
 app.include_router(competitor_router.router)

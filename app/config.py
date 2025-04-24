@@ -11,6 +11,12 @@ class Settings(BaseSettings):
     # API Configuration
     api_key: str = os.getenv("API_KEY", "")
     
+    # Pinterest API Configuration
+    pinterest_api_key: str = os.getenv("PINTEREST_API_KEY", "")
+    pinterest_app_id: str = os.getenv("PINTEREST_APP_ID", "")
+    pinterest_app_secret: str = os.getenv("PINTEREST_APP_SECRET", "")
+    pinterest_access_token: str = os.getenv("PINTEREST_ACCESS_TOKEN", "")
+    
     # Database Configuration
     db_host: str = os.getenv("DB_HOST", "localhost")
     db_port: int = int(os.getenv("DB_PORT", "27017"))

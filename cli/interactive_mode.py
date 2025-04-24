@@ -310,6 +310,18 @@ class InteractiveSession:
         if not board_id:
             print("\n❌ Pinterest board ID is required.")
             return
+            
+        # Get brand name
+        brand_name = self._input("Enter brand name")
+        if not brand_name:
+            print("\n❌ Brand name is required.")
+            return
+            
+        # Get industry
+        industry = self._input("Enter industry")
+        if not industry:
+            print("\n❌ Industry is required.")
+            return
         
         # Confirm analysis
         if not self._confirm(f"\nAnalyze Pinterest board '{board_id}' for pipeline '{self.context.get('pipeline_name')}'?"):
@@ -320,8 +332,10 @@ class InteractiveSession:
         try:
             print("\n🔄 Analyzing Pinterest board...")
             request_data = {
-                "boardId": board_id,
-                "pipelineId": self.context.get("pipeline_id")
+                "pinterest_board": board_id,
+                "pipelineId": self.context.get("pipeline_id"),
+                "brand_name": brand_name,
+                "industry": industry
             }
             
             response = self.api_client.analyze_brand(request_data)
