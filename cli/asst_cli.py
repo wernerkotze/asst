@@ -76,7 +76,9 @@ class AsstCli:
     def analyze_brand(self, args: argparse.Namespace) -> None:
         """Analyze a brand using Pinterest board."""
         request_data = {
-            "boardId": args.board_id,
+            "pinterest_board": args.pinterest_board,
+            "brand_name": args.brand_name,
+            "industry": args.industry,
             "pipelineId": args.pipeline_id
         }
         
@@ -235,7 +237,9 @@ def main():
     
     # Analyze brand command
     analyze_brand_parser = subparsers.add_parser("analyze-brand", help="Analyze a brand using Pinterest board")
-    analyze_brand_parser.add_argument("--board-id", required=True, help="Pinterest board ID or URL")
+    analyze_brand_parser.add_argument("--pinterest-board", required=True, help="Pinterest board ID or URL")
+    analyze_brand_parser.add_argument("--brand-name", required=True, help="Name of the brand")
+    analyze_brand_parser.add_argument("--industry", required=True, help="Industry of the brand")
     analyze_brand_parser.add_argument("--pipeline-id", help="Pipeline ID to associate with the persona")
     
     # Analyze competitors command

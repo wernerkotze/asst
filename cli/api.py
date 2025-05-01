@@ -12,11 +12,12 @@ from cli.config import get_config_value
 class ApiClient:
     """Client for interacting with the ASST API."""
     
-    def __init__(self, api_url: str = None):
+    def __init__(self, api_url: str = None, mock_mode: bool = True):
         """Initialize the API client."""
         self.api_url = api_url or get_config_value("api_url")
         self.headers = {"Content-Type": "application/json"}
         self.timeout = get_config_value("timeout")
+        self.mock_mode = mock_mode
     
     def make_request(self, method: str, endpoint: str, data: Dict = None, params: Dict = None) -> Any:
         """
@@ -31,6 +32,10 @@ class ApiClient:
         Returns:
             Any: Response data
         """
+        # If in mock mode, return mock responses instead of making actual API calls
+        if self.mock_mode:
+            return self._get_mock_response(method, endpoint, data, params)
+            
         url = f"{self.api_url}{endpoint}"
         
         try:
@@ -158,3 +163,111 @@ class ApiClient:
     def cancel_scheduled_post(self, post_id: str) -> Dict:
         """Cancel a scheduled post."""
         return self.make_request("delete", f"/schedule/posts/{post_id}")
+        
+    def _get_mock_response(self, method: str, endpoint: str, data: Dict = None, params: Dict = None) -> Any:
+        """Generate mock responses for testing without a server."""
+        # Mock responses for different endpoints
+        if endpoint == "/pipelines/" and method.lower() == "get":
+            return [
+                {
+                    "id": "mock_pipeline_id",
+                    "name": "Chelsea FC Fan Account",
+                    "type": "ai_influencer",
+                    "description": "AI-powered Chelsea FC fan account",
+                    "createdAt": "2025-05-01T00:00:00Z",
+                    "updatedAt": "2025-05-01T00:00:00Z"
+                }
+            ]
+        elif "/analyze/brand/" in endpoint and method.lower() == "post":
+            return {
+                "id": "persona_12345",
+                "pipelineId": data.get("pipelineId"),
+                "brand_name": data.get("brand_name"),
+                "industry": data.get("industry"),
+                "name": "Vintage Cozy",
+                "colors": ["#C16639", "#708D81", "#F5A9B8"],
+                "tone_keywords": ["playful", "cozy", "vintage"],
+                "style_keywords": ["home", "retro", "comfort"],
+                "content_themes": ["home", "retro", "comfort"],
+                "voice_description": "Warm, nostalgic, friendly tone",
+                "createdAt": "2025-05-01T00:00:00Z",
+                "updatedAt": "2025-05-01T00:00:00Z"
+            }
+        elif "/analyze/competitors/" in endpoint and method.lower() == "post":
+            return {
+                "id": "framework_12345",
+                "pipelineId": data.get("pipelineId"),
+                "seedAccounts": data.get("seedAccounts", []),
+                "contentCategories": {"news": 0.4, "meme": 0.3, "opinion": 0.3},
+                "postingFrequency": {"perDay": 3, "perWeek": 21},
+                "peakTimes": {"hours": [12, 18], "days": ["Sat", "Tue"]},
+                "hashtagStrategy": ["#ChelseaFC", "#CFC", "#KTBFFH"],
+                "stylePresets": ["witty", "concise"],
+                "createdAt": "2025-05-01T00:00:00Z",
+                "updatedAt": "2025-05-01T00:00:00Z"
+            }
+        elif "/content/retrieve" in endpoint and method.lower() == "post":
+            return [
+                {
+                    "id": "raw_1",
+                    "source": "news",
+                    "title": "Chelsea FC wins Premier League",
+                    "body": "Chelsea FC has won the Premier League after a decisive victory...",
+                    "url": "https://example.com/news/chelsea-wins",
+                    "publishedAt": "2025-05-01T00:00:00Z",
+                    "author": "Sports Reporter",
+                    "imageUrl": "https://example.com/images/chelsea-win.jpg",
+                    "tags": ["Chelsea", "Premier League", "Football"]
+                }
+            ]
+        elif "/content/enhance" in endpoint and method.lower() == "post":
+            return [
+                {
+                    "rawContentId": "raw_1",
+                    "enhancedText": "Chelsea FC has won the Premier League after a decisive victory! #CFC #Champions",
+                    "sentiment": "positive",
+                    "suggestedHashtags": ["#CFC", "#Champions", "#PremierLeague"],
+                    "suggestedMedia": ["https://example.com/images/chelsea-celebration.jpg"]
+                }
+            ]
+        elif "/content/personalize" in endpoint and method.lower() == "post":
+            return {
+                "enhancedContentId": data.get("enhancedContentId"),
+                "personaId": data.get("personaId"),
+                "personalizedText": "INCREDIBLE! Chelsea FC has done it again! The Blues are Premier League champions! 🏆 #CFC #Champions",
+                "stylePreset": data.get("stylePreset")
+            }
+        elif "/content/image" in endpoint and method.lower() == "post":
+            return "https://example.com/generated_image.jpg"
+        elif "/content/format" in endpoint and method.lower() == "post":
+            return {
+                "personalizedContentId": data.get("personalizedContentId"),
+                "formattedText": "INCREDIBLE! Chelsea FC wins again! #CFC",
+                "channel": data.get("channel"),
+                "mediaUrls": data.get("mediaUrls", [])
+            }
+        elif "/schedule/post" in endpoint and method.lower() == "post":
+            return {
+                "id": "scheduled_post_123",
+                "pipelineId": data.get("pipelineId"),
+                "content": data.get("content"),
+                "scheduledTime": data.get("scheduledTime"),
+                "platforms": data.get("platforms", []),
+                "status": "scheduled",
+                "createdAt": "2025-05-01T00:00:00Z"
+            }
+        elif "/schedule/posts" in endpoint and method.lower() == "get":
+            return [
+                {
+                    "id": "scheduled_post_123",
+                    "pipelineId": "mock_pipeline_id",
+                    "content": "INCREDIBLE! Chelsea FC wins again! #CFC",
+                    "scheduledTime": "2025-05-02T12:00:00Z",
+                    "platforms": ["twitter", "instagram"],
+                    "status": "scheduled",
+                    "createdAt": "2025-05-01T00:00:00Z"
+                }
+            ]
+            
+        # Default response for any other endpoints
+        return {"status": "success", "message": "Mock response for testing"}
